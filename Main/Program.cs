@@ -19,7 +19,7 @@ namespace Main
         public static void TimeStamp(string message)
         {
             long elapsedTime = (long)(DateTime.UtcNow - _startTime).TotalMilliseconds;
-            Console.WriteLine($"{0} : {1}", elapsedTime, message);
+            Console.WriteLine("{0} : {1}", elapsedTime, message);
         }
 
         static void Main(string[] args)
@@ -27,17 +27,24 @@ namespace Main
             _semaphore = new Semaphore(20, 50);
             _handler = new ListenerThreadHandler();
             HttpListener listener = new HttpListener();
-            string url = $"http://localhost/";
+            string url = "http://localhost/";
             listener.Prefixes.Add(url);
             listener.Start();
-            Task.Run(function: () =>
+            //Task.Run(function: () =>
+            //{
+            //    while (true)
+            //    {
+            //        _semaphore.WaitOne();
+            //        BeginConnListener(listener);
+            //    }
+            //});
+            //Allocate own threads instead
+            for (int i = 0; i < 20; i++)
             {
-                while (true)
-                {
-                    _semaphore.WaitOne();
-                    BeginConnListener(listener);
-                }
-            });
+                Thread thread = new Thread(new ParameterizedThreadStart(WaitForConnection));
+                thread.IsBackground = true;
+                thread.Start(listener);
+            }
             StartTime();
             for (int i = 0; i < 10; i++)
             {
@@ -48,6 +55,16 @@ namespace Main
             Console.ReadLine();
         }
 
+        private static void WaitForConnection(object objListener)
+        {
+            HttpListener listener = (HttpListener)objListener;
+            while (true)
+            {
+                TimeStamp("StartConnectionListener Thread ID: " + Thread.CurrentThread.ManagedThreadId);
+                HttpListenerContext context = listener.GetContext();
+                _handler.Process(context);
+            }
+        }
 
 
         private static async void BeginConnListener(HttpListener listener)
