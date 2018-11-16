@@ -21,7 +21,7 @@ namespace Main
          return resultString;
       }
       /// <summary>
-      /// 
+      /// Returns everything to the right of the first occurence of specified string or empty string
       /// </summary>
       /// <param name="sourceString"></param>
       /// <param name="str"></param>

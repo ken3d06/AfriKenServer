@@ -10,11 +10,23 @@ namespace Main
    class Program
    {
       private static Semaphore _semaphore;
+      private static DateTime _startTime;
+
+      public static void StartTime()
+      {
+         _startTime = DateTime.UtcNow;
+      }
+
+      public static void TimeStamp(string message)
+      {
+         long elapsedTime = (long) (DateTime.UtcNow - _startTime).TotalMilliseconds;
+         Console.WriteLine($"{0} : {1}", elapsedTime, message);
+      }
       static void Main(string[] args)
       {
          _semaphore = new Semaphore(20, 50);
          HttpListener listener = new HttpListener();
-         string url = "http://localhost/";
+         string url = $"http://localhost/";
          listener.Prefixes.Add(url);
          listener.Start();
          Task.Run(function: () =>
@@ -31,6 +43,7 @@ namespace Main
 
       private static async void BeginConnListener(HttpListener listener)
       {
+         TimeStamp("BeginConnListener Thread ID: " + Thread.CurrentThread.ManagedThreadId);
          HttpListenerContext context = await listener.GetContextAsync();
          _semaphore.Release();
 
