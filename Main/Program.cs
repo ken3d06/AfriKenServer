@@ -38,6 +38,12 @@ namespace Main
                     BeginConnListener(listener);
                 }
             });
+            StartTime();
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"Request # {i}");
+                MakeRequest(i);
+            }
             Console.WriteLine("Press any key to exit AfriKen Server");
             Console.ReadLine();
         }
@@ -50,6 +56,13 @@ namespace Main
             HttpListenerContext context = await listener.GetContextAsync();
             _semaphore.Release();
             _handler.Process(context);
+        }
+
+        static async void MakeRequest(int i)
+        {
+            TimeStamp("MakeRequest " + i + " start, Thread ID: " + Thread.CurrentThread.ManagedThreadId);
+            string ret = await RequestIssuer.HttpGet("http://localhost/firstpage.html");
+            TimeStamp("MakeRequest " + i + " end, Thread ID: " + Thread.CurrentThread.ManagedThreadId);
         }
     }
 }
