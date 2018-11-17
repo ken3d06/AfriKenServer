@@ -10,6 +10,7 @@ namespace Main
         private static Semaphore _semaphore;
         private static DateTime _startTime;
         private static ListenerThreadHandler _handler;
+        private static SingleThreadedQueueingHandler _sHandler;
 
         public static void StartTime()
         {
@@ -24,8 +25,9 @@ namespace Main
 
         static void Main(string[] args)
         {
-            _semaphore = new Semaphore(20, 50);
-            _handler = new ListenerThreadHandler();
+            //_semaphore = new Semaphore(20, 50);
+            //_handler = new ListenerThreadHandler();
+            _sHandler = new SingleThreadedQueueingHandler();
             HttpListener listener = new HttpListener();
             string url = "http://localhost/";
             listener.Prefixes.Add(url);
@@ -62,7 +64,8 @@ namespace Main
             {
                 TimeStamp("StartConnectionListener Thread ID: " + Thread.CurrentThread.ManagedThreadId);
                 HttpListenerContext context = listener.GetContext();
-                _handler.Process(context);
+                //_handler.Process(context);
+                _sHandler.Process(context);
             }
         }
 

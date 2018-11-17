@@ -55,6 +55,14 @@ namespace Main
             }
         }
 
+        /// <summary>
+        /// Enqueue the received context rather than processing it.
+        /// </summary>
+        public void Process(HttpListenerContext context)
+        {
+            requests.Enqueue(context);
+            semQueue.Release();
+        }
         private void MonitorQueue()
         {
             Task.Run(() =>
